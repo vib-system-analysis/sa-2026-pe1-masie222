@@ -23,6 +23,7 @@ REQUIRED_FIELDS = (
 )
 
 FORBIDDEN_VALUES = (
+    'evidence_status != real',
     'YYYY-MM-DD',
     'HH:MM',
     'не собранно',

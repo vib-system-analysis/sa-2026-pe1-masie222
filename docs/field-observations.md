@@ -86,6 +86,7 @@
 {
   "id": "field-001",
   "evidence_type": "field-observation",
+  "source_type": "direct-observation",
   "date": "YYYY-MM-DD",
   "start_time": "HH:MM",
   "end_time": "HH:MM",
