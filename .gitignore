@@ -1,0 +1,13 @@
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Editor and OS
+.DS_Store
+.vscode/
