@@ -3,6 +3,7 @@ from pathlib import Path
 
 REQUIRED_FIELDS = (
     'id',
+    'evidence_type',
     'date',
     'start_time',
     'end_time',
@@ -44,6 +45,8 @@ def main() -> None:
 
     ids = set()
     for record in records:
+        if record.get('evidence_type') != 'field-observation':
+            raise SystemExit(f"BLOCKED: observation {record.get('id', '<unknown>')} is secondary, synthetic, or not field evidence")
         missing = [field for field in REQUIRED_FIELDS if not str(record.get(field, '')).strip()]
         if missing:
             raise SystemExit(f"BLOCKED: observation {record.get('id', '<unknown>')} missing fields: {missing}")
