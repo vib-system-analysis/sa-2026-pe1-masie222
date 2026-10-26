@@ -83,7 +83,9 @@
 
 ## Команда проекта
 
-Проект выполняется командой из четырёх ролей:
+Проект выполняется проектной командой из четырёх ролей. Эти роли проектируют и проверяют будущий прототип, но они не являются наблюдёнными операторами реального найма. Текущее состояние процесса описано отдельно в [docs/current-state.md](docs/current-state.md); пока оно не заполнено наблюдениями, нельзя утверждать конкретный пошаговый workflow «сейчас».
+
+Роли проектной команды:
 
 - **Product / VO:** формулирует ценность, сценарии пользователя и границы MVP.
 - **AI Engineer:** проектирует пайплайн анализа резюме и оценку качества модели.
@@ -94,7 +96,7 @@
 
 Работа рассчитана на 16 недель и разбита на семь спринтов-лабораторных:
 
-1. Исследование процесса рекрутера и формирование требований.
+1. Описать реальный процесс «сейчас» по наблюдениям и сформировать требования.
 2. Сбор синтетического датасета и проектирование пайплайна данных.
 3. Реализация извлечения навыков и сопоставления вакансии с резюме.
 4. Разработка скоринга, ранжирования и объяснений решения.
@@ -117,7 +119,7 @@
 
 Первая лабораторная оформлена как набор артефактов четырёх ролей:
 
-- Product / VO: [PRD](docs/prd.md), [контекстная граница](docs/context-boundary.md), [заинтересованные стороны и цели](docs/stakeholders.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф](docs/brief.md).
+- Product / VO: [PRD](docs/prd.md), [система сейчас](docs/current-state.md), [контекстная граница](docs/context-boundary.md), [заинтересованные стороны и цели](docs/stakeholders.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф будущего прототипа](docs/brief.md).
 - AI Engineer: [ресёрч](docs/research.md), [кандидаты моделей](docs/model-candidates.md), [первые эксперименты](docs/experiments/lab1.md), [notebook](docs/experiments/lab1.ipynb), [ADR](docs/adr-001.md).
 - Delivery: [инструкция деплоя](docs/deploy.md), [compose](compose.dev.yml), [CI](.github/workflows/ci.yml), [шаблон PR](.github/PULL_REQUEST_TEMPLATE/lab1.md).
 - Quality & Safety: [метрики](docs/quality/success-criteria.md), [план golden dataset](docs/quality/golden-dataset-plan.md), [примеры](docs/quality/golden-dataset.jsonl), [черновик DoD](docs/quality/dod-draft.md), [протокол и журнал наблюдений из поля](docs/field-observations.md).
