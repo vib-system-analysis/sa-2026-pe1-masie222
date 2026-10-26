@@ -117,7 +117,7 @@
 
 Первая лабораторная оформлена как набор артефактов четырёх ролей:
 
-- Product / VO: [PRD](docs/prd.md), [заинтересованные стороны и цели](docs/stakeholders.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф](docs/brief.md).
+- Product / VO: [PRD](docs/prd.md), [контекстная граница](docs/context-boundary.md), [заинтересованные стороны и цели](docs/stakeholders.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф](docs/brief.md).
 - AI Engineer: [ресёрч](docs/research.md), [кандидаты моделей](docs/model-candidates.md), [первые эксперименты](docs/experiments/lab1.md), [notebook](docs/experiments/lab1.ipynb), [ADR](docs/adr-001.md).
 - Delivery: [инструкция деплоя](docs/deploy.md), [compose](compose.dev.yml), [CI](.github/workflows/ci.yml), [шаблон PR](.github/PULL_REQUEST_TEMPLATE/lab1.md).
 - Quality & Safety: [метрики](docs/quality/success-criteria.md), [план golden dataset](docs/quality/golden-dataset-plan.md), [примеры](docs/quality/golden-dataset.jsonl), [черновик DoD](docs/quality/dod-draft.md), [протокол и журнал наблюдений из поля](docs/field-observations.md).
