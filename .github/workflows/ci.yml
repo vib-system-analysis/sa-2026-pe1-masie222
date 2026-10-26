@@ -27,6 +27,9 @@ jobs:
           json.load(open("docs/experiments/lab1.ipynb", encoding="utf-8"))
           print("JSON and notebook validation passed")
           PY
+      - name: Reject empty field observation templates
+        run: python tests/validate_field_observations.py
+
       - name: Validate required lab files
         run: |
           test -f README.md

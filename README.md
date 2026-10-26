@@ -140,6 +140,7 @@ docker compose -f compose.dev.yml down
 
 ```bash
 python tests/validate_dataset.py
+python tests/validate_field_observations.py
 python -m json.tool docs/experiments/lab1.ipynb >/dev/null
 docker compose -f compose.dev.yml config >/dev/null
 git diff --check
