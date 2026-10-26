@@ -1,40 +1,62 @@
+import json
 from pathlib import Path
 
-REQUIRED_FIELD_MARKERS = (
-    'Полевая доказательная база отсутствует',
-    'Реальный эпизод должен иметь дату, время, место, систему, конкретного участника',
-    'записанное наблюдение',
-    'поле «что удивило»',
+REQUIRED_FIELDS = (
+    'id',
+    'date',
+    'start_time',
+    'end_time',
+    'timezone',
+    'place',
+    'system',
+    'work_object',
+    'participant_role',
+    'participant_id',
+    'source_access',
+    'context',
+    'observation',
+    'surprised',
+    'hypothesis',
+    'verdict',
+    'source',
 )
 
-REQUIRED_CURRENT_STATE_MARKERS = (
-    'Состояние реального процесса отбора резюме в репозитории не описано и не подтверждено',
-    'Процесс сегодня: не собран',
-    'система сейчас не описана',
-)
-
-FORBIDDEN_EVIDENCE_SHAPES = (
-    'Рекрутер обрабатывает сотни резюме вручную и принимает решения',
-    'К декабрю рекрутер малого HR-отдела открывает систему',
-    '| OBS-001 |',
-    '| OBS-002 |',
-    '| OBS-003 |',
-    'Статус: шаблон.',
+FORBIDDEN_VALUES = (
+    'YYYY-MM-DD',
+    'HH:MM',
+    'не собранно',
+    'не назначен',
+    'шаблон',
 )
 
 
 def main() -> None:
-    field_text = Path('docs/field-observations.md').read_text(encoding='utf-8')
-    current_text = Path('docs/current-state.md').read_text(encoding='utf-8')
+    path = Path('docs/field-observations.jsonl')
+    if not path.is_file():
+        raise SystemExit(
+            'BLOCKED: field observations are missing. '
+            'Create docs/field-observations.jsonl with three real episodes.'
+        )
 
-    missing_markers = [marker for marker in REQUIRED_FIELD_MARKERS if marker not in field_text]
-    missing_markers += [marker for marker in REQUIRED_CURRENT_STATE_MARKERS if marker not in current_text]
-    assert not missing_markers, f'missing field evidence markers: {missing_markers}'
+    records = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line]
+    if len(records) < 3:
+        raise SystemExit('BLOCKED: at least three real field observations are required.')
 
-    forbidden = [shape for shape in FORBIDDEN_EVIDENCE_SHAPES if shape in field_text + current_text]
-    assert not forbidden, f'empty observation template must not be presented as evidence: {forbidden}'
+    ids = set()
+    for record in records:
+        missing = [field for field in REQUIRED_FIELDS if not str(record.get(field, '')).strip()]
+        if missing:
+            raise SystemExit(f"BLOCKED: observation {record.get('id', '<unknown>')} missing fields: {missing}")
+        if record['id'] in ids:
+            raise SystemExit(f"BLOCKED: duplicate observation id: {record['id']}")
+        ids.add(record['id'])
 
-    print('field evidence guard passed: no fabricated observations')
+        serialized = json.dumps(record, ensure_ascii=False).lower()
+        forbidden = [value for value in FORBIDDEN_VALUES if value in serialized]
+        if forbidden:
+            raise SystemExit(f"BLOCKED: observation {record['id']} contains template values: {forbidden}")
+
+    print(f'field evidence guard passed: {len(records)} real observations')
 
 
 if __name__ == '__main__':

@@ -117,6 +117,8 @@
 
 ## Лабораторная 1
 
+> **Статус сдачи: ЗАБЛОКИРОВАНА.** В репозитории нет реальных наблюдений из похода в систему: ни одного эпизода с датой, временем, местом, конкретным участником и ответом «что удивило». Артефакты ниже описывают план и могут быть проверены как часть разработки, но лабораторная не считается выполненной до добавления минимум трёх реальных записей в `docs/field-observations.jsonl`.
+
 Первая лабораторная оформлена как набор артефактов четырёх ролей:
 
 - Product / VO: [PRD](docs/prd.md), [система сейчас](docs/current-state.md), [контекстная граница](docs/context-boundary.md), [заинтересованные стороны и цели](docs/stakeholders.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф будущего прототипа](docs/brief.md).
@@ -142,7 +144,7 @@ docker compose -f compose.dev.yml down
 
 ```bash
 python tests/validate_dataset.py
-python tests/validate_field_observations.py
+python tests/validate_field_observations.py  # сейчас завершается BLOCKED без реальных эпизодов
 python -m json.tool docs/experiments/lab1.ipynb >/dev/null
 docker compose -f compose.dev.yml config >/dev/null
 git diff --check
