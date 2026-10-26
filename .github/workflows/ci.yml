@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate JSON and notebooks
+        run: python -m json.tool docs/quality/golden-dataset.jsonl >/dev/null 2>&1 || python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in [Path("docs/quality/golden-dataset.jsonl")]:
+              for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                  json.loads(line)
+          json.load(open("docs/experiments/lab1.ipynb", encoding="utf-8"))
+          print("JSON and notebook validation passed")
+          PY
+      - name: Validate required lab files
+        run: |
+          test -f README.md
+          test -f compose.dev.yml
+          test -f .env.example
+          test -f docs/prd.md
+          test -f docs/hypotheses.md
+          test -f docs/glossary.md
+          test -f docs/brief.md
+          test -f docs/research.md
+          test -f docs/model-candidates.md
+          test -f docs/experiments/lab1.md
+          test -f docs/experiments/lab1.ipynb
+          test -f docs/quality/success-criteria.md
+          test -f docs/quality/golden-dataset-plan.md
+          test -f docs/quality/golden-dataset.jsonl
+          test -f docs/quality/dod-draft.md
+      - name: Validate Compose
+        run: docker compose -f compose.dev.yml config >/dev/null
+      - name: Start and smoke-test dev stack
+        run: |
+          trap 'docker compose -f compose.dev.yml down --remove-orphans' EXIT
+          docker compose -f compose.dev.yml up --detach --wait --wait-timeout 60
+          curl --noproxy '*' --fail http://127.0.0.1:8080/ | grep -q 'AI-ассистент HR'
+          curl --noproxy '*' --fail http://127.0.0.1:8081/status.json | grep -q 'synthetic-stub'

@@ -1,5 +1,7 @@
 # AI-ассистент HR
 
+[![CI](https://github.com/vib-system-analysis/sa-2026-pe1-masie222/actions/workflows/ci.yml/badge.svg)](https://github.com/vib-system-analysis/sa-2026-pe1-masie222/actions/workflows/ci.yml)
+
 Проект для курса «Системы искусственного интеллекта» по отбору резюме под вакансию.
 
 ## О проекте
@@ -111,12 +113,50 @@
 - Продемонстрирована защита от скрытых вредоносных инструкций в резюме.
 - Решение об отборе и отказе остаётся за человеком.
 
+## Лабораторная 1
+
+Первая лабораторная оформлена как набор артефактов четырёх ролей:
+
+- Product / VO: [PRD](docs/prd.md), [гипотезы](docs/hypotheses.md), [глоссарий](docs/glossary.md), [итоговый бриф](docs/brief.md).
+- AI Engineer: [ресёрч](docs/research.md), [кандидаты моделей](docs/model-candidates.md), [первые эксперименты](docs/experiments/lab1.md), [notebook](docs/experiments/lab1.ipynb), [ADR](docs/adr-001.md).
+- Delivery: [инструкция деплоя](docs/deploy.md), [compose](compose.dev.yml), [CI](.github/workflows/ci.yml), [шаблон PR](.github/PULL_REQUEST_TEMPLATE/lab1.md).
+- Quality & Safety: [метрики](docs/quality/success-criteria.md), [план golden dataset](docs/quality/golden-dataset-plan.md), [примеры](docs/quality/golden-dataset.jsonl), [черновик DoD](docs/quality/dod-draft.md).
+
+### Быстрый запуск
+
+Требования: Docker с Compose и curl.
+
+```bash
+cp .env.example .env
+docker compose -f compose.dev.yml up --detach
+curl --fail http://127.0.0.1:8080/
+curl --fail http://127.0.0.1:8081/status.json
+docker compose -f compose.dev.yml down
+```
+
+Это запускает статическую заглушку на `8080` и mock-модель на `8081`. Реальная модель, API-ключи и реальные резюме пока отключены.
+
+### Проверка артефактов
+
+```bash
+python tests/validate_dataset.py
+python -m json.tool docs/experiments/lab1.ipynb >/dev/null
+docker compose -f compose.dev.yml config >/dev/null
+git diff --check
+```
+
+Публичная production-заглушка должна стать доступной после включения GitHub Pages и добавления workflow публикации. Инструкцию см. в [docs/deploy.md](docs/deploy.md). На момент сдачи репозитория публичный URL ещё отсутствует, поэтому README не содержит ложное утверждение о production-доступности.
+
+Страница Диспуты по работе не открывается без авторизации: адрес [disputa.ru/app/works/1](https://disputa.ru/app/works/1) перенаправляет на `/login`. Критерии роли и конкретные поля сдачи Диспуты будут заполнены после авторизации владельца работы. Исходное техническое содержание лабы взято из публичного Markdown по ссылке ниже.
+
 ## Контекст курса
 
 Проект реализуется в рамках курса «Системы искусственного интеллекта» на первом курсе программы «Прикладная экономика». Оценка исходной темы по фильтру курса: 18/20.
 
 **Сильные стороны темы:** конкретный процесс, понятный пользовательский результат, проверяемое качество и явно выраженные риски.
 
-## Источник
+## Источники
 
-Исходное описание проекта: [AI HR Assistant](https://sii.sergeivolchkov.ru/projects/ai-hr-assistant.md)
+- Исходное описание проекта: [AI HR Assistant](https://sii.sergeivolchkov.ru/projects/ai-hr-assistant.md).
+- Требования лабораторной: [Лабораторная 1](https://sii.sergeivolchkov.ru/labs/lab1.md).
+- Рабочая форма сдачи: [Диспута](https://disputa.ru/app/works/1).
