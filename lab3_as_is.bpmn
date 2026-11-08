@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_Lab3"
+                  targetNamespace="https://example.org/sa-2026/lab3">
+  <bpmn:process id="Process_ResumeScreening" name="Первичный отбор резюме: реконструкция по интервью" isExecutable="false">
+    <bpmn:documentation>Не прямое наблюдение, а реконструкция одного случая по интервью HR-рекрутера от 2026-11-08, 18:00–18:25. Название организации и личные данные обезличены.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Recruiter" name="HR-рекрутер">
+        <bpmn:flowNodeRef>StartEvent_Requisition</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ReviewRequirements</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PublishVacancy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ScreenResumes</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_InfoSufficient</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_HoldResume</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateShortlist</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ManagerReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_InterviewInvites</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_HH" name="HeadHunter / кандидат">
+        <bpmn:flowNodeRef>Task_ContactCandidate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CandidateReply</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Excel" name="Excel / электронная почта">
+        <bpmn:flowNodeRef>Task_UpdateCandidate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SaveKnown</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ResumeProcessed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendShortlist</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Manager" name="Руководитель отдела разработки">
+        <bpmn:flowNodeRef>Task_ReviewShortlist</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_Requisition" name="Получена заявка на подбор">
+      <bpmn:outgoing>Flow_Start_Requirements</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_ReviewRequirements" name="Уточнить требования: Python, SQL, Git, полный день">
+      <bpmn:incoming>Flow_Start_Requirements</bpmn:incoming>
+      <bpmn:outgoing>Flow_Requirements_Publish</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_PublishVacancy" name="Опубликовать вакансию на HeadHunter">
+      <bpmn:incoming>Flow_Requirements_Publish</bpmn:incoming>
+      <bpmn:outgoing>Flow_Publish_Screen</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ScreenResumes" name="Открыть и сравнить 38 резюме (5–7 мин. на одно)">
+      <bpmn:incoming>Flow_Publish_Screen</bpmn:incoming>
+      <bpmn:outgoing>Flow_Screen_Gateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_InfoSufficient" name="Данных о навыках достаточно?" default="Flow_InfoMissing">
+      <bpmn:incoming>Flow_Screen_Gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_InfoComplete</bpmn:outgoing>
+      <bpmn:outgoing>Flow_InfoMissing</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_HoldResume" name="Отложить резюме; продолжить просмотр и вернуться позже">
+      <bpmn:incoming>Flow_InfoMissing</bpmn:incoming>
+      <bpmn:outgoing>Flow_Hold_Contact</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ContactCandidate" name="Написать кандидату и уточнить SQL через HeadHunter">
+      <bpmn:incoming>Flow_Hold_Contact</bpmn:incoming>
+      <bpmn:outgoing>Flow_Contact_Reply</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_CandidateReply" name="Ответить: SQL изучал самостоятельно, делал учебные проекты">
+      <bpmn:incoming>Flow_Contact_Reply</bpmn:incoming>
+      <bpmn:outgoing>Flow_Reply_Update</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_UpdateCandidate" name="Внести уточнение SQL в Excel и включить кандидата в рассмотрение">
+      <bpmn:incoming>Flow_Reply_Update</bpmn:incoming>
+      <bpmn:outgoing>Flow_Update_Record</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SaveKnown" name="Занести сведения по резюме в Excel">
+      <bpmn:incoming>Flow_InfoComplete</bpmn:incoming>
+      <bpmn:outgoing>Flow_Save_Shortlist</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_ResumeProcessed" name="Резюме внесено или уточнено">
+      <bpmn:incoming>Flow_Save_Shortlist</bpmn:incoming>
+      <bpmn:incoming>Flow_Update_Record</bpmn:incoming>
+      <bpmn:outgoing>Flow_Processed_Shortlist</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_CreateShortlist" name="Сформировать итоговый список из 7 кандидатов">
+      <bpmn:incoming>Flow_Processed_Shortlist</bpmn:incoming>
+      <bpmn:outgoing>Flow_Shortlist_Send</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SendShortlist" name="Отправить список и комментарии руководителю по email">
+      <bpmn:incoming>Flow_Shortlist_Send</bpmn:incoming>
+      <bpmn:outgoing>Flow_Send_Manager</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ReviewShortlist" name="Рассмотреть 7 кандидатов и выбрать 2 для интервью">
+      <bpmn:incoming>Flow_Send_Manager</bpmn:incoming>
+      <bpmn:outgoing>Flow_Manager_Review</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ManagerReview" name="Передать рекрутеру результат рассмотрения">
+      <bpmn:incoming>Flow_Manager_Review</bpmn:incoming>
+      <bpmn:outgoing>Flow_Review_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_InterviewInvites" name="Двух кандидатов пригласили на интервью">
+      <bpmn:incoming>Flow_Review_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_Requirements" sourceRef="StartEvent_Requisition" targetRef="Task_ReviewRequirements"/>
+    <bpmn:sequenceFlow id="Flow_Requirements_Publish" sourceRef="Task_ReviewRequirements" targetRef="Task_PublishVacancy"/>
+    <bpmn:sequenceFlow id="Flow_Publish_Screen" sourceRef="Task_PublishVacancy" targetRef="Task_ScreenResumes" name="38 откликов"/>
+    <bpmn:sequenceFlow id="Flow_Screen_Gateway" sourceRef="Task_ScreenResumes" targetRef="Gateway_InfoSufficient"/>
+    <bpmn:sequenceFlow id="Flow_InfoComplete" sourceRef="Gateway_InfoSufficient" targetRef="Task_SaveKnown" name="Да"/>
+    <bpmn:sequenceFlow id="Flow_InfoMissing" sourceRef="Gateway_InfoSufficient" targetRef="Task_HoldResume" name="Нет: пробел по SQL"/>
+    <bpmn:sequenceFlow id="Flow_Hold_Contact" sourceRef="Task_HoldResume" targetRef="Task_ContactCandidate"/>
+    <bpmn:sequenceFlow id="Flow_Contact_Reply" sourceRef="Task_ContactCandidate" targetRef="Task_CandidateReply" name="Сообщение в HeadHunter"/>
+    <bpmn:sequenceFlow id="Flow_Reply_Update" sourceRef="Task_CandidateReply" targetRef="Task_UpdateCandidate" name="Ответ кандидата"/>
+    <bpmn:sequenceFlow id="Flow_Update_Record" sourceRef="Task_UpdateCandidate" targetRef="Gateway_ResumeProcessed"/>
+    <bpmn:sequenceFlow id="Flow_Save_Shortlist" sourceRef="Task_SaveKnown" targetRef="Gateway_ResumeProcessed"/>
+    <bpmn:sequenceFlow id="Flow_Processed_Shortlist" sourceRef="Gateway_ResumeProcessed" targetRef="Task_CreateShortlist"/>
+    <bpmn:sequenceFlow id="Flow_Shortlist_Send" sourceRef="Task_CreateShortlist" targetRef="Task_SendShortlist"/>
+    <bpmn:sequenceFlow id="Flow_Send_Manager" sourceRef="Task_SendShortlist" targetRef="Task_ReviewShortlist" name="Список и комментарии"/>
+    <bpmn:sequenceFlow id="Flow_Manager_Review" sourceRef="Task_ReviewShortlist" targetRef="Task_ManagerReview"/>
+    <bpmn:sequenceFlow id="Flow_Review_End" sourceRef="Task_ManagerReview" targetRef="EndEvent_InterviewInvites"/>
+    <bpmn:textAnnotation id="Annotation_Source">
+      <bpmn:text>Реконструкция по одному интервью от 08.11.2026, 18:00–18:25; напрямую не наблюдалось.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_Source" sourceRef="Task_ScreenResumes" targetRef="Annotation_Source"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Lab3">
+    <bpmndi:BPMNPlane id="BPMNPlane_Lab3" bpmnElement="Process_ResumeScreening">
+      <bpmndi:BPMNShape id="Lane_Recruiter_di" bpmnElement="Lane_Recruiter" isHorizontal="true">
+        <dc:Bounds x="80" y="130" width="3100" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_HH_di" bpmnElement="Lane_HH" isHorizontal="true">
+        <dc:Bounds x="80" y="380" width="3100" height="205"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Excel_di" bpmnElement="Lane_Excel" isHorizontal="true">
+        <dc:Bounds x="80" y="585" width="3100" height="195"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Manager_di" bpmnElement="Lane_Manager" isHorizontal="true">
+        <dc:Bounds x="80" y="780" width="3100" height="190"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Requisition_di" bpmnElement="StartEvent_Requisition">
+        <dc:Bounds x="310" y="225" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReviewRequirements_di" bpmnElement="Task_ReviewRequirements">
+        <dc:Bounds x="390" y="200" width="210" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PublishVacancy_di" bpmnElement="Task_PublishVacancy">
+        <dc:Bounds x="650" y="200" width="215" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ScreenResumes_di" bpmnElement="Task_ScreenResumes">
+        <dc:Bounds x="915" y="200" width="235" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InfoSufficient_di" bpmnElement="Gateway_InfoSufficient" isMarkerVisible="true">
+        <dc:Bounds x="1210" y="218" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_HoldResume_di" bpmnElement="Task_HoldResume">
+        <dc:Bounds x="1325" y="285" width="250" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ContactCandidate_di" bpmnElement="Task_ContactCandidate">
+        <dc:Bounds x="1600" y="420" width="260" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CandidateReply_di" bpmnElement="Task_CandidateReply">
+        <dc:Bounds x="1890" y="420" width="270" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateCandidate_di" bpmnElement="Task_UpdateCandidate">
+        <dc:Bounds x="1880" y="635" width="230" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SaveKnown_di" bpmnElement="Task_SaveKnown">
+        <dc:Bounds x="1600" y="635" width="230" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateShortlist_di" bpmnElement="Task_CreateShortlist">
+        <dc:Bounds x="2250" y="200" width="240" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ResumeProcessed_di" bpmnElement="Gateway_ResumeProcessed" isMarkerVisible="true">
+        <dc:Bounds x="2160" y="650" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendShortlist_di" bpmnElement="Task_SendShortlist">
+        <dc:Bounds x="2520" y="635" width="245" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReviewShortlist_di" bpmnElement="Task_ReviewShortlist">
+        <dc:Bounds x="2790" y="825" width="230" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ManagerReview_di" bpmnElement="Task_ManagerReview">
+        <dc:Bounds x="2790" y="200" width="230" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_InterviewInvites_di" bpmnElement="EndEvent_InterviewInvites">
+        <dc:Bounds x="3060" y="225" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Annotation_Source_di" bpmnElement="Annotation_Source">
+        <dc:Bounds x="915" y="300" width="250" height="62"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Requirements_di" bpmnElement="Flow_Start_Requirements">
+        <di:waypoint x="346" y="243"/>
+        <di:waypoint x="390" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Requirements_Publish_di" bpmnElement="Flow_Requirements_Publish">
+        <di:waypoint x="600" y="243"/>
+        <di:waypoint x="650" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Publish_Screen_di" bpmnElement="Flow_Publish_Screen">
+        <di:waypoint x="865" y="243"/>
+        <di:waypoint x="915" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Screen_Gateway_di" bpmnElement="Flow_Screen_Gateway">
+        <di:waypoint x="1150" y="243"/>
+        <di:waypoint x="1210" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InfoComplete_di" bpmnElement="Flow_InfoComplete">
+        <di:waypoint x="1260" y="243"/>
+        <di:waypoint x="1400" y="243"/>
+        <di:waypoint x="1400" y="675"/>
+        <di:waypoint x="1600" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InfoMissing_di" bpmnElement="Flow_InfoMissing">
+        <di:waypoint x="1235" y="268"/>
+        <di:waypoint x="1235" y="322"/>
+        <di:waypoint x="1325" y="322"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Hold_Contact_di" bpmnElement="Flow_Hold_Contact">
+        <di:waypoint x="1575" y="322"/>
+        <di:waypoint x="1585" y="322"/>
+        <di:waypoint x="1585" y="460"/>
+        <di:waypoint x="1600" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Contact_Reply_di" bpmnElement="Flow_Contact_Reply">
+        <di:waypoint x="1860" y="460"/>
+        <di:waypoint x="1890" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Reply_Update_di" bpmnElement="Flow_Reply_Update">
+        <di:waypoint x="2160" y="460"/>
+        <di:waypoint x="2175" y="460"/>
+        <di:waypoint x="2175" y="675"/>
+        <di:waypoint x="2110" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Update_Record_di" bpmnElement="Flow_Update_Record">
+        <di:waypoint x="2110" y="675"/>
+        <di:waypoint x="2160" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Save_Shortlist_di" bpmnElement="Flow_Save_Shortlist">
+        <di:waypoint x="1830" y="675"/>
+        <di:waypoint x="2160" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Processed_Shortlist_di" bpmnElement="Flow_Processed_Shortlist">
+        <di:waypoint x="2210" y="675"/>
+        <di:waypoint x="2225" y="675"/>
+        <di:waypoint x="2225" y="243"/>
+        <di:waypoint x="2250" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Shortlist_Send_di" bpmnElement="Flow_Shortlist_Send">
+        <di:waypoint x="2490" y="243"/>
+        <di:waypoint x="2500" y="243"/>
+        <di:waypoint x="2500" y="675"/>
+        <di:waypoint x="2520" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Send_Manager_di" bpmnElement="Flow_Send_Manager">
+        <di:waypoint x="2765" y="675"/>
+        <di:waypoint x="2778" y="675"/>
+        <di:waypoint x="2778" y="865"/>
+        <di:waypoint x="2790" y="865"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Manager_Review_di" bpmnElement="Flow_Manager_Review">
+        <di:waypoint x="2905" y="825"/>
+        <di:waypoint x="2905" y="286"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Review_End_di" bpmnElement="Flow_Review_End">
+        <di:waypoint x="3020" y="243"/>
+        <di:waypoint x="3060" y="243"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_Source_di" bpmnElement="Association_Source">
+        <di:waypoint x="1032" y="286"/>
+        <di:waypoint x="1032" y="300"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
