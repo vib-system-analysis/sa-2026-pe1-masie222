@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_Lab3"
+                  targetNamespace="https://example.org/sa-2026/lab3">
+  <bpmn:process id="Process_CurrentPrototype" name="As-is: открытие демо-страницы прототипа" isExecutable="false">
+    <bpmn:documentation>Модель подтверждена исходниками статической страницы. Реальный процесс найма и пользовательские сессии не наблюдались.</bpmn:documentation>
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_User" name="Пользователь страницы">
+        <bpmn:flowNodeRef>StartEvent_Open</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OpenPage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ViewPage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_PageShown</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Prototype" name="Браузер / прототип">
+        <bpmn:flowNodeRef>Task_ReturnHtml</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RenderPage</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_Open" name="Страница нужна пользователю">
+      <bpmn:outgoing>Flow_Start_Open</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_OpenPage" name="Открыть демо-страницу (GET /)">
+      <bpmn:incoming>Flow_Start_Open</bpmn:incoming>
+      <bpmn:outgoing>Flow_Open_Return</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ReturnHtml" name="Вернуть статичный HTML (index.html)">
+      <bpmn:incoming>Flow_Open_Return</bpmn:incoming>
+      <bpmn:outgoing>Flow_Return_Render</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_RenderPage" name="Показать заголовок и фиксированный статус">
+      <bpmn:incoming>Flow_Return_Render</bpmn:incoming>
+      <bpmn:outgoing>Flow_Render_View</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ViewPage" name="Увидеть демо-заглушку без формы резюме">
+      <bpmn:incoming>Flow_Render_View</bpmn:incoming>
+      <bpmn:outgoing>Flow_View_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_PageShown" name="Страница показана; отбора резюме нет">
+      <bpmn:incoming>Flow_View_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_Open" sourceRef="StartEvent_Open" targetRef="Task_OpenPage"/>
+    <bpmn:sequenceFlow id="Flow_Open_Return" sourceRef="Task_OpenPage" targetRef="Task_ReturnHtml" name="Запрос страницы"/>
+    <bpmn:sequenceFlow id="Flow_Return_Render" sourceRef="Task_ReturnHtml" targetRef="Task_RenderPage" name="HTML страницы"/>
+    <bpmn:sequenceFlow id="Flow_Render_View" sourceRef="Task_RenderPage" targetRef="Task_ViewPage"/>
+    <bpmn:sequenceFlow id="Flow_View_End" sourceRef="Task_ViewPage" targetRef="EndEvent_PageShown"/>
+    <bpmn:textAnnotation id="Annotation_NoBranch">
+      <bpmn:text>Развилок и обработки резюме в проверенной статической странице нет. Рабочий процесс HR не наблюдался.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_NoBranch" sourceRef="Task_RenderPage" targetRef="Annotation_NoBranch"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Lab3">
+    <bpmndi:BPMNPlane id="BPMNPlane_Lab3" bpmnElement="Process_CurrentPrototype">
+      <bpmndi:BPMNShape id="Lane_User_di" bpmnElement="Lane_User" isHorizontal="true">
+        <dc:Bounds x="80" y="145" width="1640" height="275"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Prototype_di" bpmnElement="Lane_Prototype" isHorizontal="true">
+        <dc:Bounds x="80" y="420" width="1640" height="325"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Open_di" bpmnElement="StartEvent_Open">
+        <dc:Bounds x="352" y="264" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OpenPage_di" bpmnElement="Task_OpenPage">
+        <dc:Bounds x="430" y="220" width="260" height="124"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReturnHtml_di" bpmnElement="Task_ReturnHtml">
+        <dc:Bounds x="770" y="500" width="265" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RenderPage_di" bpmnElement="Task_RenderPage">
+        <dc:Bounds x="1090" y="500" width="270" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ViewPage_di" bpmnElement="Task_ViewPage">
+        <dc:Bounds x="1090" y="220" width="270" height="124"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_PageShown_di" bpmnElement="EndEvent_PageShown">
+        <dc:Bounds x="1492" y="264" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Annotation_NoBranch_di" bpmnElement="Annotation_NoBranch">
+        <dc:Bounds x="1405" y="500" width="285" height="120"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Open_di" bpmnElement="Flow_Start_Open">
+        <di:waypoint x="388" y="282"/>
+        <di:waypoint x="430" y="282"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Open_Return_di" bpmnElement="Flow_Open_Return">
+        <di:waypoint x="690" y="282"/>
+        <di:waypoint x="730" y="282"/>
+        <di:waypoint x="730" y="560"/>
+        <di:waypoint x="770" y="560"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Return_Render_di" bpmnElement="Flow_Return_Render">
+        <di:waypoint x="1035" y="560"/>
+        <di:waypoint x="1090" y="560"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Render_View_di" bpmnElement="Flow_Render_View">
+        <di:waypoint x="1225" y="500"/>
+        <di:waypoint x="1225" y="344"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_View_End_di" bpmnElement="Flow_View_End">
+        <di:waypoint x="1360" y="282"/>
+        <di:waypoint x="1492" y="282"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_NoBranch_di" bpmnElement="Association_NoBranch">
+        <di:waypoint x="1360" y="560"/>
+        <di:waypoint x="1405" y="560"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
